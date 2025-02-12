@@ -2,7 +2,9 @@
 #include "rcamera.h"
 
 int main(void) {
-    InitWindow(800, 450, "Mycraft");
+	const int width = 800;
+	const int height = 450;
+	InitWindow(width, height, "Mycraft");
 
 	Camera camera     = { 0 };
 	camera.position   = (Vector3){ 4.0f, 8.0f, 4.0f };
@@ -11,23 +13,27 @@ int main(void) {
 	camera.fovy       = 60.0f;
 	camera.projection = CAMERA_PERSPECTIVE;
 
-    DisableCursor();
+	DisableCursor();
 
-    SetTargetFPS(30);
+	SetMousePosition(width/2, height/2);
 
-    while (!WindowShouldClose()) {
-        UpdateCamera(&camera, CAMERA_FIRST_PERSON);
+	SetTargetFPS(30);
 
-        BeginDrawing();
+	while (!WindowShouldClose()) {
+		UpdateCamera(&camera, CAMERA_FIRST_PERSON);
 
-        ClearBackground(RAYWHITE);
+		BeginDrawing();
 
-        BeginMode3D(camera);
+		ClearBackground(RAYWHITE);
+
+		BeginMode3D(camera);
 
 		// Basic world-gen
 		// l0 - Bedrock - BLACK
 		// l1-3 - Stone, Ores - GREY
 		// l4-6, Dirt, Grass - BROWN, GREEN
+
+		Ray crosshairRay = GetScreenToWorldRay((Vector2){ width/2, height/2 }, camera);
 
 		for (int l = 0; l <= 6; ++l) {
 			for (float i = 0.0f; i < 20.0f; i += 1.0f) {
@@ -40,17 +46,32 @@ int main(void) {
 					else if(l == 6)
 						color = DARKGREEN;
 
-					DrawCube((Vector3){ i, l, j }, 1, 1, 1, color);
+					Vector3 pos = (Vector3){ i, l, j };
+					const float size = 1.0f;
+
+					DrawCube(pos, size, size, size, color);
+
+					RayCollision col = GetRayCollisionBox(crosshairRay,
+							(BoundingBox){(Vector3){ pos.x - size/4, pos.y - size/4, pos.z - size/4 },
+							(Vector3){ pos.x + size/4, pos.y + size/4, pos.z + size/4 }});
+
+					if(col.hit) {
+						DrawCubeWires(pos, size, size, size, WHITE);
+					}
 				}
 			}
 		}
 
-        EndMode3D();
+		EndMode3D();
 
-        EndDrawing();
-    }
+		// Crosshair
+		DrawLine(width / 2 - 10, height / 2, width / 2 + 10, height / 2, RED);
+		DrawLine(width / 2, height / 2 - 10, width / 2, height / 2 + 10, RED);
 
-    CloseWindow();
+		EndDrawing();
+	}
 
-    return 0;
+	CloseWindow();
+
+	return 0;
 }
