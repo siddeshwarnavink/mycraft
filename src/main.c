@@ -1,6 +1,21 @@
 #include "raylib.h"
 #include "rcamera.h"
 
+#define WORLD_LENGTH 20
+#define WORLD_BREADTH 20
+#define WORLD_HEIGHT 6
+
+// 0 - void
+// 1 - bedrock
+// 2 - stone
+// 3 - dirt
+// 4 - grass
+#define INIT_WORLD_LAYER(value) { [0 ... WORLD_LENGTH-1] = { [0 ... WORLD_BREADTH-1] = value } }
+#define INIT_WORLD(value) { [0 ... WORLD_HEIGHT-1] = INIT_WORLD_LAYER(value) }
+const int world[WORLD_HEIGHT][WORLD_LENGTH][WORLD_BREADTH] = INIT_WORLD(3);
+
+Vector3 selected = { 0 };
+
 int main(void) {
 	const int width = 800;
 	const int height = 450;
@@ -28,25 +43,36 @@ int main(void) {
 
 		BeginMode3D(camera);
 
-		// Basic world-gen
-		// l0 - Bedrock - BLACK
-		// l1-3 - Stone, Ores - GREY
-		// l4-6, Dirt, Grass - BROWN, GREEN
-
 		Ray crosshairRay = GetScreenToWorldRay((Vector2){ width/2, height/2 }, camera);
 
-		for (int l = 0; l <= 6; ++l) {
-			for (float i = 0.0f; i < 20.0f; i += 1.0f) {
-				for (float j = 0.0f; j < 20.0f; j += 1.0f) {
-					Color color = BROWN;
-					if (l == 0)
-						color = BLACK;
-					else if(l > 0 && l < 4)
-						color = GRAY;
-					else if(l == 6)
-						color = DARKGREEN;
+		for (int depth = 0; depth < WORLD_HEIGHT; ++depth) {
+			for (int length = 0; length < WORLD_LENGTH; ++length) {
+				for (int breath = 0; breath < WORLD_BREADTH; ++breath) {
+					Color color;
+					switch(world[depth][length][breath]) {
+						case 1:
+							// Bedrock
+							color = BLACK;
+							break;
+						case 2:
+							// Stone
+							color = GRAY;
+							break;
+						case 3:
+							// Dirt
+							color = BROWN;
+							break;
+						case 4:
+							// Grass
+							color = DARKGREEN;
+							break;
+						default:
+							// Grass
+							color = DARKGREEN;
+							break;
+					}
 
-					Vector3 pos = (Vector3){ i, l, j };
+					Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
 					const float size = 1.0f;
 
 					DrawCube(pos, size, size, size, color);
@@ -56,6 +82,7 @@ int main(void) {
 							(Vector3){ pos.x + size/4, pos.y + size/4, pos.z + size/4 }});
 
 					if(col.hit) {
+						selected = pos;
 						DrawCubeWires(pos, size, size, size, WHITE);
 					}
 				}
@@ -67,6 +94,9 @@ int main(void) {
 		// Crosshair
 		DrawLine(width / 2 - 10, height / 2, width / 2 + 10, height / 2, RED);
 		DrawLine(width / 2, height / 2 - 10, width / 2, height / 2 + 10, RED);
+
+		// Debug
+		DrawText(TextFormat("Selected: %.1f, %.1f, %.1f", selected.x, selected.y, selected.z), 20, 20, 15, BLACK);
 
 		EndDrawing();
 	}
