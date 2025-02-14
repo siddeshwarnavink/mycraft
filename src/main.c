@@ -12,9 +12,15 @@
 // 4 - grass
 #define INIT_WORLD_LAYER(value) { [0 ... WORLD_LENGTH-1] = { [0 ... WORLD_BREADTH-1] = value } }
 #define INIT_WORLD(value) { [0 ... WORLD_HEIGHT-1] = INIT_WORLD_LAYER(value) }
-const int world[WORLD_HEIGHT][WORLD_LENGTH][WORLD_BREADTH] = INIT_WORLD(3);
+int world[WORLD_HEIGHT][WORLD_LENGTH][WORLD_BREADTH] = INIT_WORLD(3);
 
-Vector3 selected = { 0 };
+typedef struct {
+	int x;
+	int y;
+	int z;
+} Vector3Int;
+
+Vector3Int selected = { 0, 0, 0 };
 
 int main(void) {
 	const int width = 800;
@@ -29,12 +35,28 @@ int main(void) {
 	camera.projection = CAMERA_PERSPECTIVE;
 
 	DisableCursor();
-
 	SetMousePosition(width/2, height/2);
+	int isHolding = 0;
+	float holdTime = 0.0f;
 
 	SetTargetFPS(30);
 
 	while (!WindowShouldClose()) {
+		// Mouse click
+		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+			if (!isHolding) {
+				isHolding = 1;
+				holdTime = 0.0f;
+			} else {
+				holdTime += GetFrameTime();
+				if (holdTime >= 1.0f) { // 1 second
+					// Break the block
+					world[selected.y][selected.x][selected.z] = 0;
+					isHolding = 0;
+				}
+			}
+		}
+
 		UpdateCamera(&camera, CAMERA_FIRST_PERSON);
 
 		BeginDrawing();
@@ -48,6 +70,7 @@ int main(void) {
 		for (int depth = 0; depth < WORLD_HEIGHT; ++depth) {
 			for (int length = 0; length < WORLD_LENGTH; ++length) {
 				for (int breath = 0; breath < WORLD_BREADTH; ++breath) {
+					if(world[depth][length][breath] < 1) continue;
 					Color color;
 					switch(world[depth][length][breath]) {
 						case 1:
@@ -75,6 +98,7 @@ int main(void) {
 					Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
 					const float size = 1.0f;
 
+
 					DrawCube(pos, size, size, size, color);
 
 					RayCollision col = GetRayCollisionBox(crosshairRay,
@@ -82,8 +106,12 @@ int main(void) {
 							(Vector3){ pos.x + size/4, pos.y + size/4, pos.z + size/4 }});
 
 					if(col.hit) {
-						selected = pos;
+						selected.x = length;
+						selected.y = depth;
+						selected.z = breath;
 						DrawCubeWires(pos, size, size, size, WHITE);
+					} else {
+						DrawCubeWires(pos, size, size, size, BLACK);
 					}
 				}
 			}
@@ -96,7 +124,9 @@ int main(void) {
 		DrawLine(width / 2, height / 2 - 10, width / 2, height / 2 + 10, RED);
 
 		// Debug
-		DrawText(TextFormat("Selected: %.1f, %.1f, %.1f", selected.x, selected.y, selected.z), 20, 20, 15, BLACK);
+		DrawText(TextFormat("Selected: %d, %d, %d", selected.x, selected.y, selected.z), 20, 20, 15, BLACK);
+		DrawText(TextFormat("isHolding: %d", isHolding), 20, 40, 15, BLACK);
+		DrawText(TextFormat("isHolding: %.2f", holdTime), 20, 60, 15, BLACK);
 
 		EndDrawing();
 	}
