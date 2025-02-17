@@ -1,37 +1,54 @@
 #include <stdint.h>
+#include <math.h>
 
 #include "raylib.h"
 #include "rcamera.h"
 
-#define WORLD_LENGTH 20
+#define WORLD_LENGTH  20
 #define WORLD_BREADTH 20
-#define WORLD_HEIGHT 6
+#define WORLD_HEIGHT  6
+#define PLAYER_HEIGHT 2
 
 #define INIT_WORLD_LAYER(value) { [0 ... WORLD_LENGTH-1] = { [0 ... WORLD_BREADTH-1] = value } }
 int world[WORLD_HEIGHT][WORLD_LENGTH][WORLD_BREADTH] = {
-    [0] = INIT_WORLD_LAYER(1), // Bedrock
-    [1] = INIT_WORLD_LAYER(2), // Stone
-    [2] = INIT_WORLD_LAYER(2), // Stone
-    [3] = INIT_WORLD_LAYER(3), // Dirt
-    [4] = INIT_WORLD_LAYER(3), // Dirt
-    [5] = INIT_WORLD_LAYER(4)  // Grass
+	[0] = INIT_WORLD_LAYER(1), // Bedrock
+	[1] = INIT_WORLD_LAYER(2), // Stone
+	[2] = INIT_WORLD_LAYER(2), // Stone
+	[3] = INIT_WORLD_LAYER(3), // Dirt
+	[4] = INIT_WORLD_LAYER(3), // Dirt
+	[5] = INIT_WORLD_LAYER(4)  // Grass
 };
+
+Camera camera = { 0 };
 
 typedef struct {
 	int x;
 	int y;
 	int z;
 } Vector3Int;
-
 Vector3Int selected = { 0, 0, 0 };
+
+/*
+ * Return what block is under the player's feet
+ */
+int blockUnderPlayer() {
+	float feetY = camera.position.y - PLAYER_HEIGHT;
+	int x = (int)floor(camera.position.x);
+	int y = (int)floor(feetY);
+	int z = (int)floor(camera.position.z);
+
+	if (x < 0 || x >= WORLD_LENGTH || z < 0 || z >= WORLD_BREADTH || y < 0 || y >= WORLD_HEIGHT)
+		return 0;
+
+	return world[y][x][z];
+}
 
 int main(void) {
 	const int width = 800;
 	const int height = 450;
 	InitWindow(width, height, "Mycraft");
 
-	Camera camera     = { 0 };
-	camera.position   = (Vector3){ 4.0f, 8.0f, 4.0f };
+	camera.position   = (Vector3){ 4.0f, (WORLD_HEIGHT + PLAYER_HEIGHT), 4.0f };
 	camera.target     = (Vector3){ 0.0f, 2.0f, 0.0f };
 	camera.up         = (Vector3){ 0.0f, 1.0f, 0.0f };
 	camera.fovy       = 60.0f;
@@ -45,7 +62,6 @@ int main(void) {
 	const float gravity      = 0.69f;
 	const float jumpSpeed    = 8.0f;
 	float verticalVelocity   = 0.0f;
-	const float groundHeight = 8.0f;
 	uint8_t isJumping        = 0;
 
 	SetTargetFPS(30);
@@ -59,28 +75,45 @@ int main(void) {
 			} else {
 				holdTime += GetFrameTime();
 				if (holdTime >= 1.0f) { // 1 second
-					// Break the block
+										// Break the block
 					world[selected.y][selected.x][selected.z] = 0;
 					isHolding = 0;
 				}
 			}
 		} else isHolding = 0;
 
-		// Jump
-		if (IsKeyPressed(KEY_SPACE) && !isJumping) {
-            isJumping = 1;
-            verticalVelocity = jumpSpeed;
-        }
-        if (isJumping) {
-            camera.position.y += verticalVelocity * GetFrameTime();
-            verticalVelocity -= gravity;
+		int onGround = (blockUnderPlayer() != 0);
 
-            if (camera.position.y <= groundHeight) {
-                camera.position.y = groundHeight;
-                isJumping = 0;
-                verticalVelocity = 0.0f;
-            }
-        }
+		// Jumping
+		if (IsKeyPressed(KEY_SPACE) && !isJumping) {
+			isJumping = 1;
+			verticalVelocity = jumpSpeed;
+		}
+		if (isJumping) {
+			camera.position.y += verticalVelocity * GetFrameTime();
+			verticalVelocity -= gravity;
+
+			if (camera.position.y <= (WORLD_HEIGHT + PLAYER_HEIGHT)) {
+				camera.position.y = (WORLD_HEIGHT + PLAYER_HEIGHT);
+				isJumping = 0;
+				verticalVelocity = 0.0f;
+			}
+		}
+
+		// Gravity
+		if (!onGround) {
+			verticalVelocity -= gravity * GetFrameTime();
+			camera.position.y += verticalVelocity * GetFrameTime();
+
+			if (blockUnderPlayer() != 0) {
+				// TODO: Make this smoother
+				float feetY = camera.position.y - PLAYER_HEIGHT;
+				int blockY = (int)floor(feetY);
+				camera.position.y = (blockY + 1.0f) + PLAYER_HEIGHT;
+				verticalVelocity = 0.0f;
+				onGround = 1;
+			}
+		}
 
 		UpdateCamera(&camera, CAMERA_FIRST_PERSON);
 
@@ -98,26 +131,26 @@ int main(void) {
 					if(world[depth][length][breath] < 1) continue;
 					Color color;
 					switch(world[depth][length][breath]) {
-                    case 1:
-                        // Bedrock
-                        color = BLACK;
-                        break;
-                    case 2:
-                        // Stone
-                        color = GRAY;
-                        break;
-                    case 3:
-                        // Dirt
-                        color = BROWN;
-                        break;
-                    case 4:
-                        // Grass
-                        color = DARKGREEN;
-                        break;
-                    default:
-                        // Grass
-                        color = DARKGREEN;
-                        break;
+						case 1:
+							// Bedrock
+							color = BLACK;
+							break;
+						case 2:
+							// Stone
+							color = GRAY;
+							break;
+						case 3:
+							// Dirt
+							color = BROWN;
+							break;
+						case 4:
+							// Grass
+							color = DARKGREEN;
+							break;
+						default:
+							// Grass
+							color = DARKGREEN;
+							break;
 					}
 
 					Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
@@ -126,8 +159,8 @@ int main(void) {
 					DrawCube(pos, size, size, size, color);
 
 					RayCollision col = GetRayCollisionBox(crosshairRay,
-                                                          (BoundingBox){(Vector3){ pos.x - size/4, pos.y - size/4, pos.z - size/4 },
-                                                                        (Vector3){ pos.x + size/4, pos.y + size/4, pos.z + size/4 }});
+							(BoundingBox){(Vector3){ pos.x - size/4, pos.y - size/4, pos.z - size/4 },
+							(Vector3){ pos.x + size/4, pos.y + size/4, pos.z + size/4 }});
 
 					if(col.hit) {
 						selected.x = length;
@@ -149,10 +182,11 @@ int main(void) {
 
 		// Debug
 		// DrawText(TextFormat("Selected: %d, %d, %d", selected.x, selected.y, selected.z), 20, 20, 15, BLACK);
-		// DrawText(TextFormat("Camera position: %.2f, %.2f, %.2f", camera.position.x, camera.position.y, camera.position.z), 20, 40, 15, BLACK);
+		DrawText(TextFormat("Camera position: %.2f, %.2f, %.2f", camera.position.x, camera.position.y, camera.position.z), 20, 40, 15, BLACK);
 		// DrawText(TextFormat("Camera target: %.2f, %.2f, %.2f", camera.target.x, camera.target.y, camera.target.z), 20, 60, 15, BLACK);
 		// DrawText(TextFormat("isHolding: %d", isHolding), 20, 40, 15, BLACK);
 		// DrawText(TextFormat("isHolding: %.2f", holdTime), 20, 60, 15, BLACK);
+		DrawText(TextFormat("Block under: %d", blockUnderPlayer()), 20, 80, 15, BLACK);
 
 		EndDrawing();
 	}
