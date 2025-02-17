@@ -123,12 +123,47 @@ int main(void) {
 
 		BeginMode3D(camera);
 
-		Ray crosshairRay = GetScreenToWorldRay((Vector2){ width/2, height/2 }, camera);
+		// Block selection
+		Ray crosshairRay              = GetScreenToWorldRay((Vector2){ width/2, height/2 }, camera);
+		RayCollision closestCollision = { 0 };
+        closestCollision.distance     = INFINITY;
+        Vector3Int newSelected        = { -1, -1, -1 };
+        const float maxRange          = 5.0f;
+
+		for (int depth = 0; depth < WORLD_HEIGHT; ++depth) {
+			for (int length = 0; length < WORLD_LENGTH; ++length) {
+				for (int breath = 0; breath < WORLD_BREADTH; ++breath) {
+					if (world[depth][length][breath] < 1) continue;
+
+					Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
+					BoundingBox box = {
+						.min = { pos.x - 0.5f, pos.y - 0.5f, pos.z - 0.5f },
+						.max = { pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f }
+					};
+
+					RayCollision col = GetRayCollisionBox(crosshairRay, box);
+
+					if (col.hit && col.distance <= maxRange && col.distance < closestCollision.distance) {
+						closestCollision = col;
+						newSelected.x = length;
+						newSelected.y = depth;
+						newSelected.z = breath;
+					}
+				}
+			}
+		}
+
+		if (closestCollision.hit) {
+			selected = newSelected;
+		} else {
+			selected.x = -1;
+		}
 
 		for (int depth = 0; depth < WORLD_HEIGHT; ++depth) {
 			for (int length = 0; length < WORLD_LENGTH; ++length) {
 				for (int breath = 0; breath < WORLD_BREADTH; ++breath) {
 					if(world[depth][length][breath] < 1) continue;
+
 					Color color;
 					switch(world[depth][length][breath]) {
 						case 1:
@@ -154,22 +189,15 @@ int main(void) {
 					}
 
 					Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
-					const float size = 1.0f;
 
+					const float size = 1.0f;
 					DrawCube(pos, size, size, size, color);
 
-					RayCollision col = GetRayCollisionBox(crosshairRay,
-							(BoundingBox){(Vector3){ pos.x - size/4, pos.y - size/4, pos.z - size/4 },
-							(Vector3){ pos.x + size/4, pos.y + size/4, pos.z + size/4 }});
-
-					if(col.hit) {
-						selected.x = length;
-						selected.y = depth;
-						selected.z = breath;
-						DrawCubeWires(pos, size, size, size, WHITE);
-					} else {
-						DrawCubeWires(pos, size, size, size, BLACK);
-					}
+					if (length == selected.x && depth == selected.y && breath == selected.z) {
+                        DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, WHITE);
+                    } else {
+                        DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, BLACK);
+                    }
 				}
 			}
 		}
@@ -181,12 +209,12 @@ int main(void) {
 		DrawLine(width / 2, height / 2 - 10, width / 2, height / 2 + 10, RED);
 
 		// Debug
-		// DrawText(TextFormat("Selected: %d, %d, %d", selected.x, selected.y, selected.z), 20, 20, 15, BLACK);
-		DrawText(TextFormat("Camera position: %.2f, %.2f, %.2f", camera.position.x, camera.position.y, camera.position.z), 20, 40, 15, BLACK);
+		DrawText(TextFormat("Selected: %d, %d, %d", selected.x, selected.y, selected.z), 20, 20, 15, BLACK);
+		// DrawText(TextFormat("Camera position: %.2f, %.2f, %.2f", camera.position.x, camera.position.y, camera.position.z), 20, 40, 15, BLACK);
 		// DrawText(TextFormat("Camera target: %.2f, %.2f, %.2f", camera.target.x, camera.target.y, camera.target.z), 20, 60, 15, BLACK);
 		// DrawText(TextFormat("isHolding: %d", isHolding), 20, 40, 15, BLACK);
 		// DrawText(TextFormat("isHolding: %.2f", holdTime), 20, 60, 15, BLACK);
-		DrawText(TextFormat("Block under: %d", blockUnderPlayer()), 20, 80, 15, BLACK);
+		// DrawText(TextFormat("Block under: %d", blockUnderPlayer()), 20, 80, 15, BLACK);
 
 		EndDrawing();
 	}
