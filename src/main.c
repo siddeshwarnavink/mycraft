@@ -59,10 +59,9 @@ int main(void) {
 	uint8_t isHolding = 0;
 	float holdTime    = 0.0f;
 
-	const float gravity      = 0.69f;
-	const float jumpSpeed    = 8.0f;
+	const float gravity      = 6.9f;
+	const float jumpSpeed    = 5.0f;
 	float verticalVelocity   = 0.0f;
-	uint8_t isJumping        = 0;
 
 	SetTargetFPS(30);
 
@@ -85,34 +84,15 @@ int main(void) {
 		int onGround = (blockUnderPlayer() != 0);
 
 		// Jumping
-		if (IsKeyPressed(KEY_SPACE) && !isJumping) {
-			isJumping = 1;
+		if (IsKeyPressed(KEY_SPACE) && onGround) {
 			verticalVelocity = jumpSpeed;
-		}
-		if (isJumping) {
-			camera.position.y += verticalVelocity * GetFrameTime();
-			verticalVelocity -= gravity;
-
-			if (camera.position.y <= (WORLD_HEIGHT + PLAYER_HEIGHT)) {
-				camera.position.y = (WORLD_HEIGHT + PLAYER_HEIGHT);
-				isJumping = 0;
-				verticalVelocity = 0.0f;
-			}
+			onGround = 0;
 		}
 
 		// Gravity
 		if (!onGround) {
-			verticalVelocity -= gravity * GetFrameTime();
 			camera.position.y += verticalVelocity * GetFrameTime();
-
-			if (blockUnderPlayer() != 0) {
-				// TODO: Make this smoother
-				float feetY = camera.position.y - PLAYER_HEIGHT;
-				int blockY = (int)floor(feetY);
-				camera.position.y = (blockY + 1.0f) + PLAYER_HEIGHT;
-				verticalVelocity = 0.0f;
-				onGround = 1;
-			}
+			verticalVelocity -= gravity * GetFrameTime();
 		}
 
 		UpdateCamera(&camera, CAMERA_FIRST_PERSON);
@@ -209,7 +189,7 @@ int main(void) {
 		DrawLine(width / 2, height / 2 - 10, width / 2, height / 2 + 10, RED);
 
 		// Debug
-		DrawText(TextFormat("Selected: %d, %d, %d", selected.x, selected.y, selected.z), 20, 20, 15, BLACK);
+		// DrawText(TextFormat("Selected: %d, %d, %d", selected.x, selected.y, selected.z), 20, 20, 15, BLACK);
 		// DrawText(TextFormat("Camera position: %.2f, %.2f, %.2f", camera.position.x, camera.position.y, camera.position.z), 20, 40, 15, BLACK);
 		// DrawText(TextFormat("Camera target: %.2f, %.2f, %.2f", camera.target.x, camera.target.y, camera.target.z), 20, 60, 15, BLACK);
 		// DrawText(TextFormat("isHolding: %d", isHolding), 20, 40, 15, BLACK);
