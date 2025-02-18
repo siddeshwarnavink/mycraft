@@ -28,4 +28,6 @@ uint8_t debugMode = 0;
 uint8_t isHolding = 0;
 float holdTime    = 0.0f;
 
-float verticalVelocity   = 0.0f;
+float verticalVelocity = 0.0f;
+
+Texture2D texture;

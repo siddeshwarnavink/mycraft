@@ -5,6 +5,7 @@
 #include "game.h"
 #include "core.h"
 #include "state.h"
+#include "blocks.h"
 
 static void _block_selection() {
 	Ray crosshairRay              = GetScreenToWorldRay((Vector2){ width/2, height/2 }, camera);
@@ -49,6 +50,19 @@ static void _render_world() {
 			for (int breath = 0; breath < WORLD_BREADTH; ++breath) {
 				if(world[depth][length][breath] < 1) continue;
 
+				Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
+
+				if (length == selected.x && depth == selected.y && breath == selected.z) {
+					DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, WHITE);
+				} else {
+					DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, BLACK);
+				}
+
+				if(world[depth][length][breath] == 4) {
+					drawGrass(pos);
+					continue;
+				}
+
 				Color color;
 				switch(world[depth][length][breath]) {
 					case 1:
@@ -72,16 +86,7 @@ static void _render_world() {
 						color = DARKGREEN;
 						break;
 				}
-
-				Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
-
 				DrawCube(pos, BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, color);
-
-				if (length == selected.x && depth == selected.y && breath == selected.z) {
-					DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, WHITE);
-				} else {
-					DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, BLACK);
-				}
 			}
 		}
 	}

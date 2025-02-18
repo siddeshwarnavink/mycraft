@@ -26,6 +26,11 @@
 typedef struct {
 	int x;
 	int y;
+} Vector2Int;
+
+typedef struct {
+	int x;
+	int y;
 	int z;
 } Vector3Int;
 
@@ -45,5 +50,7 @@ extern float holdTime;
 
 // Gravity & jumping
 extern float verticalVelocity;
+
+extern Texture2D texture;
 
 #endif // !STATE_H

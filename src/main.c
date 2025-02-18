@@ -13,6 +13,8 @@ int main(void) {
 
 	SetTargetFPS(30);
 
+	texture = LoadTexture("resources/texture.png");
+
 	while (!WindowShouldClose()) {
 		// Fullscreen toggle
 		if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT))) {
@@ -33,6 +35,7 @@ int main(void) {
 	}
 
 	CloseWindow();
+	UnloadTexture(texture);
 
 	return 0;
 }

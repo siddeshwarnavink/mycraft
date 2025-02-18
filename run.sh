@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm mycraft
+make clean
 make
 ./mycraft
 
