@@ -4,3 +4,4 @@ include/raymath.h
 include/rcamera.h
 include/rlgl.h
 mycraft
+*.o
