@@ -4,10 +4,16 @@
 #include "raylib.h"
 #include "rcamera.h"
 
+#define WINDOW_WIDTH  800
+#define WINDOW_HEIGHT 450
+
 #define WORLD_LENGTH  20
 #define WORLD_BREADTH 20
 #define WORLD_HEIGHT  6
+#define BLOCK_SIZE 1.0f
+
 #define PLAYER_HEIGHT 2
+#define PLAYER_WIDTH  0.35f
 
 #define INIT_WORLD_LAYER(value) { [0 ... WORLD_LENGTH-1] = { [0 ... WORLD_BREADTH-1] = value } }
 int world[WORLD_HEIGHT][WORLD_LENGTH][WORLD_BREADTH] = {
@@ -43,10 +49,43 @@ int blockUnderPlayer() {
 	return world[y][x][z];
 }
 
+/*
+ * If player is colliding with a block.
+ */
+uint8_t playerColliding() {
+	for (int depth = 0; depth < WORLD_HEIGHT; ++depth) {
+		for (int length = 0; length < WORLD_LENGTH; ++length) {
+			for (int breath = 0; breath < WORLD_BREADTH; ++breath) {
+				if(world[depth][length][breath] < 1) continue;
+
+				Vector3 block = (Vector3){ (float)length, (float)depth, (float)breath };
+				BoundingBox blockBox = (BoundingBox){
+                    .min = { block.x - BLOCK_SIZE / 2, block.y - BLOCK_SIZE / 2, block.z - BLOCK_SIZE / 2 },
+                    .max = { block.x + BLOCK_SIZE / 2, block.y + BLOCK_SIZE / 2, block.z + BLOCK_SIZE / 2 }
+                };
+
+				Vector3 player = camera.position;
+				BoundingBox playerBox = (BoundingBox){
+                    .min = { player.x - PLAYER_WIDTH / 2, player.y - PLAYER_HEIGHT, player.z - PLAYER_WIDTH / 2 },
+                    .max = { player.x + PLAYER_WIDTH / 2, player.y, player.z + PLAYER_WIDTH / 2 }
+                };
+
+				if (CheckCollisionBoxes(playerBox, blockBox)) {
+                    return 1;
+                }
+
+			}
+		}
+	}
+	return 0;
+}
+
 int main(void) {
-	const int width = 800;
-	const int height = 450;
+	int width = WINDOW_WIDTH;
+	int height = WINDOW_HEIGHT;
 	InitWindow(width, height, "Mycraft");
+
+	uint8_t debugMode = 0;
 
 	camera.position   = (Vector3){ 4.0f, (WORLD_HEIGHT + PLAYER_HEIGHT), 4.0f };
 	camera.target     = (Vector3){ 0.0f, 2.0f, 0.0f };
@@ -66,6 +105,24 @@ int main(void) {
 	SetTargetFPS(30);
 
 	while (!WindowShouldClose()) {
+		// Fullscreen toggle
+		if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT))) {
+			int display = GetCurrentMonitor();
+			if (IsWindowFullscreen()) {
+				width = WINDOW_WIDTH;
+				height = WINDOW_HEIGHT;
+			}
+			else {
+				width = GetMonitorWidth(display);
+				height = GetMonitorHeight(display);
+			}
+			SetWindowSize(width, height);
+			ToggleFullscreen();
+		}
+
+		// Debug toggle
+		if (IsKeyPressed(KEY_F3)) debugMode = !debugMode;
+
 		// Mouse click
 		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
 			if (!isHolding) {
@@ -95,20 +152,29 @@ int main(void) {
 			verticalVelocity -= gravity * GetFrameTime();
 		}
 
-		UpdateCamera(&camera, CAMERA_FIRST_PERSON);
+		Vector3 oldPosition = camera.position;
+        UpdateCamera(&camera, CAMERA_FIRST_PERSON);
+
+        if (playerColliding(camera.position))
+            camera.position = oldPosition;
 
 		BeginDrawing();
 
-		ClearBackground(RAYWHITE);
+		ClearBackground(SKYBLUE);
 
 		BeginMode3D(camera);
+
+		// Player hitbox (debug)
+		if(debugMode) {
+			DrawCubeWires(camera.position, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_WIDTH, DARKPURPLE);
+		}
 
 		// Block selection
 		Ray crosshairRay              = GetScreenToWorldRay((Vector2){ width/2, height/2 }, camera);
 		RayCollision closestCollision = { 0 };
-        closestCollision.distance     = INFINITY;
-        Vector3Int newSelected        = { -1, -1, -1 };
-        const float maxRange          = 5.0f;
+		closestCollision.distance     = INFINITY;
+		Vector3Int newSelected        = { -1, -1, -1 };
+		const float maxRange          = 5.0f;
 
 		for (int depth = 0; depth < WORLD_HEIGHT; ++depth) {
 			for (int length = 0; length < WORLD_LENGTH; ++length) {
@@ -170,14 +236,13 @@ int main(void) {
 
 					Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
 
-					const float size = 1.0f;
-					DrawCube(pos, size, size, size, color);
+					DrawCube(pos, BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, color);
 
 					if (length == selected.x && depth == selected.y && breath == selected.z) {
-                        DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, WHITE);
-                    } else {
-                        DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, BLACK);
-                    }
+						DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, WHITE);
+					} else {
+						DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, BLACK);
+					}
 				}
 			}
 		}
@@ -189,12 +254,15 @@ int main(void) {
 		DrawLine(width / 2, height / 2 - 10, width / 2, height / 2 + 10, RED);
 
 		// Debug
-		// DrawText(TextFormat("Selected: %d, %d, %d", selected.x, selected.y, selected.z), 20, 20, 15, BLACK);
-		// DrawText(TextFormat("Camera position: %.2f, %.2f, %.2f", camera.position.x, camera.position.y, camera.position.z), 20, 40, 15, BLACK);
-		// DrawText(TextFormat("Camera target: %.2f, %.2f, %.2f", camera.target.x, camera.target.y, camera.target.z), 20, 60, 15, BLACK);
-		// DrawText(TextFormat("isHolding: %d", isHolding), 20, 40, 15, BLACK);
-		// DrawText(TextFormat("isHolding: %.2f", holdTime), 20, 60, 15, BLACK);
-		// DrawText(TextFormat("Block under: %d", blockUnderPlayer()), 20, 80, 15, BLACK);
+		if(debugMode) {
+			DrawText(TextFormat("Selected: %d, %d, %d", selected.x, selected.y, selected.z), 20, 10, 10, BLACK);
+			DrawText(TextFormat("Camera position: %.2f, %.2f, %.2f", camera.position.x, camera.position.y, camera.position.z), 20, 20, 10, BLACK);
+			DrawText(TextFormat("Camera target: %.2f, %.2f, %.2f", camera.target.x, camera.target.y, camera.target.z), 20, 30, 10, BLACK);
+			DrawText(TextFormat("Mouse holding: %d", isHolding), 20, 40, 10, BLACK);
+			DrawText(TextFormat("Mouse holding duration: %.2f", holdTime), 20, 50, 10, BLACK);
+			DrawText(TextFormat("Block under: %d", blockUnderPlayer()), 20, 60, 10, BLACK);
+			DrawText(TextFormat("Player colliding: %d", playerColliding()), 20, 70, 10, BLACK);
+		}
 
 		EndDrawing();
 	}
