@@ -58,39 +58,10 @@ static void _render_world() {
 					DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, BLACK);
 				}
 
-				if(world[depth][length][breath] == 4) {
-					drawGrass(pos);
-					continue;
-				}
-
-				Color color;
-				switch(world[depth][length][breath]) {
-					case 1:
-						// Bedrock
-						color = BLACK;
-						break;
-					case 2:
-						// Stone
-						color = GRAY;
-						break;
-					case 3:
-						// Dirt
-						color = BROWN;
-						break;
-					case 4:
-						// Grass
-						color = DARKGREEN;
-						break;
-					default:
-						// Grass
-						color = DARKGREEN;
-						break;
-				}
-				DrawCube(pos, BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, color);
+				drawBlock(world[depth][length][breath], pos);
 			}
 		}
 	}
-
 }
 
 void gameLoop() {
