@@ -5,3 +5,10 @@ Grass - https://opengameart.org/content/grass-texture-pack
 Dirt - https://opengameart.org/content/dirt-texture-pack
 Stone - https://opengameart.org/content/stone-texture
 Bedrock - https://opengameart.org/content/stone-texture-1
+
+Sounds
+===
+
+Background - https://opengameart.org/content/path-walk
+Player jump - https://opengameart.org/content/playersounds-1-by-emopreben
+Player damage - https://opengameart.org/content/playersounds-1-by-emopreben

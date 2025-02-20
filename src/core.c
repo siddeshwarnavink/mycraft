@@ -1,7 +1,9 @@
 #include <math.h>
+#include <stdlib.h>
 
 #include "core.h"
 #include "state.h"
+#include "sounds.h"
 
 int blockUnderPlayer() {
 	float feetY = camera.position.y - PLAYER_HEIGHT;
@@ -48,6 +50,12 @@ void handleGravity() {
 
 	// Jumping
 	if (IsKeyPressed(KEY_SPACE) && onGround) {
+		int randomNumber = rand() % 2;
+		if (randomNumber == 0)
+			playSound(S_JUMP1);
+		else
+			playSound(S_JUMP2);
+
 		verticalVelocity = JUMP_SPEED;
 		onGround = 0;
 	}

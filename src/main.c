@@ -1,12 +1,22 @@
+#include <stdlib.h>
+#include <time.h>
+
 #include "raylib.h"
 
 #include "game.h"
 #include "state.h"
+#include "sounds.h"
 
 int main(void) {
+	srand(time(NULL));
+
 	width = WINDOW_WIDTH;
 	height = WINDOW_HEIGHT;
 	InitWindow(width, height, "Mycraft");
+
+	InitAudioDevice();
+	loadSounds();
+	playSound(S_BACKGROUND1);
 
 	DisableCursor();
 	SetMousePosition(width/2, height/2);
@@ -36,6 +46,8 @@ int main(void) {
 
 	CloseWindow();
 	UnloadTexture(texture);
+	unloadSounds();
+	CloseAudioDevice();
 
 	return 0;
 }

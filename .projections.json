@@ -1,0 +1,13 @@
+{
+    "*": {
+        "make": "./run.sh"
+    },
+    "src/*.c": {
+        "type": "src",
+        "alternate": "src/{}.h"
+    },
+    "src/*.h": {
+        "type": "header",
+        "alternate": "src/{}.c"
+    }
+}
