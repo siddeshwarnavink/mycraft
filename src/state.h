@@ -53,4 +53,6 @@ extern float verticalVelocity;
 
 extern Texture2D texture;
 
+extern int hudPos;
+
 #endif // !STATE_H

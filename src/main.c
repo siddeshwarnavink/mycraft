@@ -25,24 +25,24 @@ int main(void) {
 
 	texture = LoadTexture("resources/texture.png");
 
-	while (!WindowShouldClose()) {
-		// Fullscreen toggle
-		if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT))) {
-			const int display = GetCurrentMonitor();
-			if (IsWindowFullscreen()) {
-				width = WINDOW_WIDTH;
-				height = WINDOW_HEIGHT;
-			}
-			else {
-				width = GetMonitorWidth(display);
-				height = GetMonitorHeight(display);
-			}
-			SetWindowSize(width, height);
-			ToggleFullscreen();
-		}
+    while (!WindowShouldClose()) {
+        // Fullscreen toggle
+        if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT))) {
+            const int display = GetCurrentMonitor();
+            if (IsWindowFullscreen()) {
+                width = WINDOW_WIDTH;
+                height = WINDOW_HEIGHT;
+            }
+            else {
+                width = GetMonitorWidth(display);
+                height = GetMonitorHeight(display);
+            }
+            SetWindowSize(width, height);
+            ToggleFullscreen();
+        }
 
-		gameLoop();
-	}
+        gameLoop();
+    }
 
 	CloseWindow();
 	UnloadTexture(texture);

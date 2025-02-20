@@ -47,12 +47,12 @@ static void _block_selection() {
 }
 
 static void _render_world() {
-	for (int depth = 0; depth < WORLD_HEIGHT; ++depth) {
-		for (int length = 0; length < WORLD_LENGTH; ++length) {
-			for (int breath = 0; breath < WORLD_BREADTH; ++breath) {
-				if(world[depth][length][breath] < 1) continue;
+    for (int depth = 0; depth < WORLD_HEIGHT; ++depth) {
+        for (int length = 0; length < WORLD_LENGTH; ++length) {
+            for (int breath = 0; breath < WORLD_BREADTH; ++breath) {
+                if(world[depth][length][breath] < 1) continue;
 
-				Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
+                Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
 
                 if (length == selected.x && depth == selected.y && breath == selected.z) {
                     DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, WHITE);
@@ -60,10 +60,23 @@ static void _render_world() {
                     DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, BLACK);
                 }
 
-				drawBlock(world[depth][length][breath], pos);
-			}
-		}
-	}
+                drawBlock(world[depth][length][breath], pos);
+            }
+        }
+    }
+}
+
+static void _render_hud() {
+    const float x = width/2 - 170;
+    const float y = height - 50;
+    const float size = 40;
+    for (int i = 0; i < 8; ++i) {
+        if(hudPos == i)
+            DrawRectangle(x+ i * (size+ 5), y, size, size, LIGHTGRAY);
+        else
+            DrawRectangle(x+ i * (size+ 5), y, size, size, GRAY);
+        DrawRectangleLines(x + i * (size + 5), y, size, size, BLACK);
+    }
 }
 
 void gameLoop() {
@@ -92,6 +105,17 @@ void gameLoop() {
 		}
 	} else isHolding = 0;
 
+    // Mouse scroll
+    float scroll = GetMouseWheelMove();
+    if (scroll > 0.0f) {
+        if(++hudPos > 7)
+            hudPos = 0;
+    }
+    else if (scroll < 0.0f) {
+        if(--hudPos < 0)
+            hudPos = 7;
+    }
+
 	handleGravity();
 	handleCollision();
 
@@ -105,12 +129,13 @@ void gameLoop() {
 	if(debugMode)
 		DrawCubeWires(camera.position, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_WIDTH, DARKPURPLE);
 
-
 	_block_selection();
 
 	_render_world();
 
 	EndMode3D();
+
+    _render_hud();
 
 	// Crosshair
 	DrawLine(width / 2 - 10, height / 2, width / 2 + 10, height / 2, RED);
@@ -125,6 +150,8 @@ void gameLoop() {
 		DrawText(TextFormat("Mouse holding duration: %.2f", holdTime), 20, 50, 10, BLACK);
 		DrawText(TextFormat("Block under: %d", blockUnderPlayer()), 20, 60, 10, BLACK);
 		DrawText(TextFormat("Player colliding: %d", playerColliding()), 20, 70, 10, BLACK);
+		DrawText(TextFormat("Mouse scroll: %f", scroll), 20, 80, 10, BLACK);
+		DrawText(TextFormat("HUD cursor position: %d", hudPos), 20, 90, 10, BLACK);
 	}
 
 	EndDrawing();

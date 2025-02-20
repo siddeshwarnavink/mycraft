@@ -30,4 +30,6 @@ float holdTime    = 0.0f;
 
 float verticalVelocity = 0.0f;
 
+int hudPos = 0;
+
 Texture2D texture;
