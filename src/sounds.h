@@ -14,8 +14,11 @@ enum SoundFile {
 	S_HURT2,
 	S_HURT3,
 	S_HURT4,
+	S_BREAK1,
+	S_BREAK2,
+	S_PUNCH
 };
-extern Sound sounds[7];
+extern Sound sounds[10];
 
 /*
  * Loads all the sound into memory.

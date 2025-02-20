@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdlib.h>
 
 #include "raylib.h"
 
@@ -6,6 +7,7 @@
 #include "core.h"
 #include "state.h"
 #include "blocks.h"
+#include "sounds.h"
 
 static void _block_selection() {
 	Ray crosshairRay              = GetScreenToWorldRay((Vector2){ width/2, height/2 }, camera);
@@ -52,11 +54,11 @@ static void _render_world() {
 
 				Vector3 pos = (Vector3){ (float)length, (float)depth, (float)breath };
 
-				if (length == selected.x && depth == selected.y && breath == selected.z) {
-					DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, WHITE);
-				} else {
-					DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, BLACK);
-				}
+                if (length == selected.x && depth == selected.y && breath == selected.z) {
+                    DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, WHITE);
+                } else {
+                    DrawCubeWires(pos, 1.0f, 1.0f, 1.0f, BLACK);
+                }
 
 				drawBlock(world[depth][length][breath], pos);
 			}
@@ -73,10 +75,17 @@ void gameLoop() {
 		if (!isHolding) {
 			isHolding = 1;
 			holdTime = 0.0f;
+			playSound(S_PUNCH);
 		} else {
 			holdTime += GetFrameTime();
 			if (holdTime >= 1.0f) { // 1 second
 									// Break the block
+				int randomNumber = rand() % 2;
+				if (randomNumber == 0)
+					playSound(S_BREAK1);
+				else
+					playSound(S_BREAK2);
+
 				world[selected.y][selected.x][selected.z] = 0;
 				isHolding = 0;
 			}
