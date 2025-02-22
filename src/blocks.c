@@ -3,14 +3,17 @@
 
 #include "state.h"
 
-static void _draw_block(Vector2 textureCoord, Vector3 position) {
+/*
+ * Use the sprite texture to draw a 3D cube.
+ */
+static void _render_block(float size, Vector2 textureCoord, Vector3 position) {
 	const float x = position.x;
 	const float y = position.y;
 	const float z = position.z;
 
-	const float width = 1.0f;
-	const float height = 1.0f;
-	const float length = 1.0f;
+	const float width = size;
+	const float height = size;
+	const float length = size;
 
 	const float texWidth = (float)texture.width;
 	const float texHeight = (float)texture.height;
@@ -95,22 +98,28 @@ static void _draw_block(Vector2 textureCoord, Vector3 position) {
 	rlSetTexture(0);
 }
 
-void drawBlock(enum BlockType block, Vector3 position) {
+/*
+ * Get the position of texture in the sprite.
+ */
+Vector2 _sprite_pos(enum BlockType block) {
     switch (block) {
         case B_BEDROCK:
-            _draw_block((Vector2){ 96, 0 }, position);
-            break;
+            return (Vector2){ 96, 0 };
         case B_STONE:
-            _draw_block((Vector2){ 64, 0 }, position);
-            break;
+            return (Vector2){ 64, 0 };
         case B_DIRT:
-            _draw_block((Vector2){ 32, 0 }, position);
-            break;
+            return (Vector2){ 32, 0 };
         case B_GRASS:
-            _draw_block((Vector2){ 0, 0 }, position);
-            break;
+            return (Vector2){ 0, 0 };
         default:
-            _draw_block((Vector2){ 0, 0 }, position);
-            break;
+            return (Vector2){ 0, 0 };
     }
+}
+
+void drawBlock(enum BlockType block, Vector3 position) {
+    _render_block(1.0f, _sprite_pos(block), position);
+}
+
+void drawHudBlock(enum BlockType block, Vector3 position) {
+    _render_block(45.0f, _sprite_pos(block), position);
 }

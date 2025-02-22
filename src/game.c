@@ -72,19 +72,38 @@ static void _render_hud() {
     const float x = width/2 - 170;
     const float y = height - 50;
     const float size = 40;
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < INVENTORY_SIZE; ++i) {
         if(hudPos == i)
             DrawRectangle(x+ i * (size+ 5), y, size, size, LIGHTGRAY);
         else
             DrawRectangle(x+ i * (size+ 5), y, size, size, GRAY);
         DrawRectangleLines(x + i * (size + 5), y, size, size, BLACK);
         if (i < inv.size) {
-            char itemText[5];
-            snprintf(itemText, sizeof(itemText), "%d", inv.items[i]);
-            char countText[5];
+            char countText[4];
             snprintf(countText, sizeof(countText), "%d", inv.qty[i]);
 
-            DrawText(itemText, x + i * (size+ 5) + (size/2), y + (size/4), 24, BLACK);
+            RenderTexture2D target = LoadRenderTexture(40, 40);
+
+            BeginTextureMode(target);
+
+            ClearBackground((Color){ 0, 0, 0, 0 });
+
+            BeginMode3D((Camera) {
+                    .position = { 100.0f, -50.0f, 100.0f },
+                    .target = { 0.0f, 2.0f, 0.0f },
+                    .up = { 0.0f, 1.0f, 0.0f },
+                    .fovy = 45.0f,
+                    .projection = CAMERA_PERSPECTIVE
+                    });
+
+            drawHudBlock(inv.items[i], (Vector3){0, 0, 0});
+
+            EndMode3D();
+
+            EndTextureMode();
+
+            DrawTexture(target.texture, x + i * (size+ 5), y, WHITE);
+
             DrawText(countText, x + i * (size+ 5) + size - 12, y, 12, BLACK);
         }
     }

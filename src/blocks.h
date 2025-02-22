@@ -9,6 +9,14 @@ enum BlockType {
     B_GRASS
 };
 
+/*
+ * Draw block for world.
+ */
 void drawBlock(enum BlockType block, Vector3 position);
+
+/*
+ * Draw block for HUD.
+ */
+void drawHudBlock(enum BlockType block, Vector3 position);
 
 #endif // !BLOCKS_H
