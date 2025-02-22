@@ -9,7 +9,8 @@
 /*
  * Return what block is under the player's feet
  */
-extern int blockUnderPlayer(void);
+extern enum BlockType blockUnderPlayer();
+
 
 /*
  * If player is colliding with a block.

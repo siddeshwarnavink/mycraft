@@ -8,6 +8,8 @@
 
 #include "raylib.h"
 #include "rcamera.h"
+#include "blocks.h"
+#include "inventory.h"
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 450
@@ -38,7 +40,7 @@ typedef struct {
 extern int width;
 extern int height;
 
-extern int world[WORLD_HEIGHT][WORLD_LENGTH][WORLD_BREADTH];
+extern enum BlockType world[WORLD_HEIGHT][WORLD_LENGTH][WORLD_BREADTH];
 extern Camera camera;
 extern Vector3Int selected;
 
@@ -54,5 +56,7 @@ extern float verticalVelocity;
 extern Texture2D texture;
 
 extern int hudPos;
+
+extern Inventory inv;
 
 #endif // !STATE_H

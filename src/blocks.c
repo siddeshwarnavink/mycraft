@@ -95,26 +95,22 @@ static void _draw_block(Vector2 textureCoord, Vector3 position) {
 	rlSetTexture(0);
 }
 
-void drawBlock(int block, Vector3 position) {
-	switch (block) {
-		case 1:
-			// Bedrock
-			_draw_block((Vector2){ 96, 0 }, position);
-			break;
-		case 2:
-			// Stone
-			_draw_block((Vector2){ 64, 0 }, position);
-			break;
-		case 3:
-			// Dirt
-			_draw_block((Vector2){ 32, 0 }, position);
-			break;
-		case 4:
-			// Grass
-			_draw_block((Vector2){ 0, 0 }, position);
-			break;
-		default:
-			_draw_block((Vector2){ 0, 0 }, position);
-			break;
-	}
+void drawBlock(enum BlockType block, Vector3 position) {
+    switch (block) {
+        case B_BEDROCK:
+            _draw_block((Vector2){ 96, 0 }, position);
+            break;
+        case B_STONE:
+            _draw_block((Vector2){ 64, 0 }, position);
+            break;
+        case B_DIRT:
+            _draw_block((Vector2){ 32, 0 }, position);
+            break;
+        case B_GRASS:
+            _draw_block((Vector2){ 0, 0 }, position);
+            break;
+        default:
+            _draw_block((Vector2){ 0, 0 }, position);
+            break;
+    }
 }

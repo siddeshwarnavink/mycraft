@@ -8,22 +8,22 @@
 #include "sounds.h"
 
 int main(void) {
-	srand(time(NULL));
+    srand(time(NULL));
 
-	width = WINDOW_WIDTH;
-	height = WINDOW_HEIGHT;
-	InitWindow(width, height, "Mycraft");
+    width = WINDOW_WIDTH;
+    height = WINDOW_HEIGHT;
+    InitWindow(width, height, "Mycraft");
 
-	InitAudioDevice();
-	loadSounds();
-	playSound(S_BACKGROUND1);
+    InitAudioDevice();
+    loadSounds();
+    playSound(S_BACKGROUND1);
 
-	DisableCursor();
-	SetMousePosition(width/2, height/2);
+    DisableCursor();
+    SetMousePosition(width/2, height/2);
 
-	SetTargetFPS(30);
+    SetTargetFPS(30);
 
-	texture = LoadTexture("resources/texture.png");
+    texture = LoadTexture("resources/texture.png");
 
     while (!WindowShouldClose()) {
         // Fullscreen toggle
@@ -44,10 +44,10 @@ int main(void) {
         gameLoop();
     }
 
-	CloseWindow();
-	UnloadTexture(texture);
-	unloadSounds();
-	CloseAudioDevice();
+    CloseWindow();
+    UnloadTexture(texture);
+    unloadSounds();
+    CloseAudioDevice();
 
-	return 0;
+    return 0;
 }

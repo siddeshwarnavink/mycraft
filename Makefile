@@ -1,7 +1,7 @@
 CC      = cc
 CFLAGS  = -I./include/
 LDFLAGS = -L./lib/ -I./include/ -l:libraylib.a -lm
-OBJS = game.o core.o state.o blocks.o sounds.o
+OBJS = game.o core.o state.o blocks.o sounds.o inventory.o
 
 mycraft: $(OBJS)
 	$(CC) -o mycraft $(OBJS) src/main.c $(CFLAGS) $(LDFLAGS)
@@ -20,6 +20,9 @@ blocks.o: src/blocks.c
 
 sounds.o: src/sounds.c
 	$(CC) -c src/sounds.c $(CFLAGS)
+
+inventory.o: src/inventory.c
+	$(CC) -c src/inventory.c $(CFLAGS)
 
 clean:
 	rm -f *.o mycraft

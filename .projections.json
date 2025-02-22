@@ -1,6 +1,7 @@
 {
     "*": {
-        "make": "./run.sh"
+        "make": "make",
+        "start": "./mycraft"
     },
     "src/*.c": {
         "type": "src",

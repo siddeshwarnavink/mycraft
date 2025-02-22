@@ -4,13 +4,13 @@ int width = WINDOW_WIDTH;
 int height = WINDOW_HEIGHT;
 
 #define INIT_WORLD_LAYER(value) { [0 ... WORLD_LENGTH-1] = { [0 ... WORLD_BREADTH-1] = value } }
-int world[WORLD_HEIGHT][WORLD_LENGTH][WORLD_BREADTH] = {
-	[0] = INIT_WORLD_LAYER(1), // Bedrock
-	[1] = INIT_WORLD_LAYER(2), // Stone
-	[2] = INIT_WORLD_LAYER(2), // Stone
-	[3] = INIT_WORLD_LAYER(3), // Dirt
-	[4] = INIT_WORLD_LAYER(3), // Dirt
-	[5] = INIT_WORLD_LAYER(4)  // Grass
+enum BlockType world[WORLD_HEIGHT][WORLD_LENGTH][WORLD_BREADTH] = {
+    [0] = INIT_WORLD_LAYER(B_BEDROCK),
+    [1] = INIT_WORLD_LAYER(B_STONE),
+    [2] = INIT_WORLD_LAYER(B_STONE),
+    [3] = INIT_WORLD_LAYER(B_STONE),
+    [4] = INIT_WORLD_LAYER(B_DIRT),
+    [5] = INIT_WORLD_LAYER(B_GRASS)
 };
 
 Vector3Int selected = { 0, 0, 0 };
@@ -33,3 +33,5 @@ float verticalVelocity = 0.0f;
 int hudPos = 0;
 
 Texture2D texture;
+
+Inventory inv = {0};
