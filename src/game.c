@@ -11,6 +11,9 @@
 #include "sounds.h"
 #include "inventory.h"
 
+/*
+ * Block selection logic.
+ */
 static void _block_selection() {
 	Ray crosshairRay              = GetScreenToWorldRay((Vector2){ width/2, height/2 }, camera);
 	RayCollision closestCollision = { 0 };
@@ -48,6 +51,9 @@ static void _block_selection() {
 	}
 }
 
+/*
+ * Render the world as we see.
+ */
 static void _render_world() {
     for (int depth = 0; depth < WORLD_HEIGHT; ++depth) {
         for (int length = 0; length < WORLD_LENGTH; ++length) {
@@ -68,6 +74,9 @@ static void _render_world() {
     }
 }
 
+/*
+ * Draw the inventory HUD.
+ */
 static void _render_hud() {
     const float x = width/2 - 170;
     const float y = height - 50;
@@ -109,6 +118,67 @@ static void _render_hud() {
     }
 }
 
+
+/*
+ * Draw right hand if a block is selected in HUD
+ * or draw the block in hand.
+ */
+static void _render_hand() {
+    if(hudPos < inv.size) {
+        RenderTexture2D target = LoadRenderTexture(width/2, width/2);
+
+        BeginTextureMode(target);
+
+        ClearBackground((Color){ 0, 0, 0, 0 });
+
+        BeginMode3D((Camera) {
+                .position = { 100.0f, -100.0f, 100.0f },
+                .target = { 0.0f, 2.0f, 0.0f },
+                .up = { 0.0f, 1.0f, 0.0f },
+                .fovy = 45.0f,
+                .projection = CAMERA_PERSPECTIVE
+                });
+
+        drawHandBlock(inv.items[hudPos], (Vector3){0, 0, 0});
+
+        const float size = 50.0f;
+        // DrawCube((Vector3){0, 0, 0}, size, size, size, RED);
+        DrawCubeWires((Vector3){0, 0, 0}, size, size, size, BLACK);
+
+        EndMode3D();
+
+        EndTextureMode();
+
+        DrawTexture(target.texture, width - (width/2), height - (height/2), WHITE);
+    } else {
+        RenderTexture2D target = LoadRenderTexture(width/2, width/2);
+
+        BeginTextureMode(target);
+
+        ClearBackground((Color){ 0, 0, 0, 0 });
+
+        BeginMode3D((Camera) {
+                .position = { 20.0f, 10.0f, 10.0f },
+                .target = { 0.0f, 0.0f, 0.0f },
+                .up = { 0.0f, 1.0f, 10.0f },
+                .fovy = 45.0f,
+                .projection = CAMERA_PERSPECTIVE
+                });
+
+        const float hand_width  = 10.0f;
+        const float hand_length = 3.5f;
+
+        DrawCube((Vector3){0, 0, 0}, hand_length, hand_length, hand_width, BROWN);
+        DrawCubeWires((Vector3){0, 0, 0}, hand_length, hand_length, hand_width, DARKGRAY);
+
+        EndMode3D();
+
+        EndTextureMode();
+
+        DrawTexture(target.texture, width - (width/2), height - (height/2), WHITE);
+    }
+}
+
 void gameLoop() {
     // Debug toggle
     if (IsKeyPressed(KEY_F3)) debugMode = !debugMode;
@@ -139,12 +209,12 @@ void gameLoop() {
     // Mouse scroll
     float scroll = GetMouseWheelMove();
     if (scroll > 0.0f) {
-        if(++hudPos > 7)
-            hudPos = 0;
-    }
-    else if (scroll < 0.0f) {
         if(--hudPos < 0)
             hudPos = 7;
+    }
+    else if (scroll < 0.0f) {
+        if(++hudPos > 7)
+            hudPos = 0;
     }
 
     handleGravity();
@@ -165,6 +235,8 @@ void gameLoop() {
     _render_world();
 
     EndMode3D();
+
+    _render_hand();
 
     _render_hud();
 

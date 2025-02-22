@@ -123,3 +123,7 @@ void drawBlock(enum BlockType block, Vector3 position) {
 void drawHudBlock(enum BlockType block, Vector3 position) {
     _render_block(45.0f, _sprite_pos(block), position);
 }
+
+void drawHandBlock(enum BlockType block, Vector3 position) {
+    _render_block(50.0f, _sprite_pos(block), position);
+}

@@ -19,4 +19,9 @@ void drawBlock(enum BlockType block, Vector3 position);
  */
 void drawHudBlock(enum BlockType block, Vector3 position);
 
+/*
+ * Draw block for hand held.
+ */
+void drawHandBlock(enum BlockType block, Vector3 position);
+
 #endif // !BLOCKS_H
