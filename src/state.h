@@ -16,7 +16,7 @@
 
 #define WORLD_LENGTH  20
 #define WORLD_BREADTH 20
-#define WORLD_HEIGHT  6
+#define WORLD_HEIGHT  20
 #define BLOCK_SIZE 1.0f
 
 #define PLAYER_HEIGHT 2
@@ -49,6 +49,9 @@ extern uint8_t debugMode;
 // Left mouse button
 extern uint8_t isHolding;
 extern float holdTime;
+
+// Mouse throttle timer
+extern float mouseThrottle;
 
 // Gravity & jumping
 extern float verticalVelocity;

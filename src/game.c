@@ -183,7 +183,7 @@ void gameLoop() {
     // Debug toggle
     if (IsKeyPressed(KEY_F3)) debugMode = !debugMode;
 
-    // Mouse click
+    // Left click (break block)
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
         if (!isHolding) {
             isHolding = 1;
@@ -205,6 +205,22 @@ void gameLoop() {
             }
         }
     } else isHolding = 0;
+
+    // Right click (place block)
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && mouseThrottle == 0.0f) {
+        mouseThrottle += GetFrameTime();
+        if(hudPos < inv.size && selected.y + 1 <= WORLD_HEIGHT) {
+            world[selected.y + 1][selected.x][selected.z] = inv.items[hudPos];
+            removeOneItem(&inv, inv.items[hudPos]);
+        }
+    }
+
+    // Mouse throttle
+    if (mouseThrottle > 0.0f && mouseThrottle < 0.5f) {
+        mouseThrottle += GetFrameTime();
+    } else {
+        mouseThrottle = 0.0f;
+    }
 
     // Mouse scroll
     float scroll = GetMouseWheelMove();

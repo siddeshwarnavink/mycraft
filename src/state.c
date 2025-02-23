@@ -16,7 +16,7 @@ enum BlockType world[WORLD_HEIGHT][WORLD_LENGTH][WORLD_BREADTH] = {
 Vector3Int selected = { 0, 0, 0 };
 
 Camera camera = {
-    .position = { 4.0f, (WORLD_HEIGHT + PLAYER_HEIGHT), 4.0f },
+    .position = { 4.0f, (6 + PLAYER_HEIGHT), 4.0f },
     .target = { 0.0f, 2.0f, 0.0f },
     .up = { 0.0f, 1.0f, 0.0f },
     .fovy = 60.0f,
@@ -25,8 +25,9 @@ Camera camera = {
 
 uint8_t debugMode = 0;
 
-uint8_t isHolding = 0;
-float holdTime    = 0.0f;
+uint8_t isHolding   = 0;
+float holdTime      = 0.0f;
+float mouseThrottle = 0.0f;
 
 float verticalVelocity = 0.0f;
 
