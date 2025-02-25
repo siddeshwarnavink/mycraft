@@ -10,6 +10,7 @@
 #include "blocks.h"
 #include "sounds.h"
 #include "inventory.h"
+#include "textures.h"
 
 /*
  * Block selection logic.
@@ -81,6 +82,10 @@ static void _render_hud() {
     const float x = width/2 - 170;
     const float y = height - 50;
     const float size = 40;
+
+    TextureSubtype subtype;
+    RenderTexture2D target;
+
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
         if(hudPos == i)
             DrawRectangle(x+ i * (size+ 5), y, size, size, LIGHTGRAY);
@@ -90,30 +95,11 @@ static void _render_hud() {
         if (i < inv.size) {
             char countText[4];
             snprintf(countText, sizeof(countText), "%d", inv.qty[i]);
-
-            RenderTexture2D target = LoadRenderTexture(40, 40);
-
-            BeginTextureMode(target);
-
-            ClearBackground((Color){ 0, 0, 0, 0 });
-
-            BeginMode3D((Camera) {
-                    .position = { 100.0f, -50.0f, 100.0f },
-                    .target = { 0.0f, 2.0f, 0.0f },
-                    .up = { 0.0f, 1.0f, 0.0f },
-                    .fovy = 45.0f,
-                    .projection = CAMERA_PERSPECTIVE
-                    });
-
-            drawHudBlock(inv.items[i], (Vector3){0, 0, 0});
-
-            EndMode3D();
-
-            EndTextureMode();
-
-            DrawTexture(target.texture, x + i * (size+ 5), y, WHITE);
-
             DrawText(countText, x + i * (size+ 5) + size - 12, y, 12, BLACK);
+
+            subtype.block = inv.items[i];
+            target = textures_get(T_HUD_BLOCK, subtype);
+            DrawTexture(target.texture, x + i * (size+ 5), y, WHITE);
         }
     }
 }
@@ -124,59 +110,15 @@ static void _render_hud() {
  * or draw the block in hand.
  */
 static void _render_hand() {
-    if(hudPos < inv.size) {
-        RenderTexture2D target = LoadRenderTexture(width/2, width/2);
-
-        BeginTextureMode(target);
-
-        ClearBackground((Color){ 0, 0, 0, 0 });
-
-        BeginMode3D((Camera) {
-                .position = { 100.0f, -100.0f, 100.0f },
-                .target = { 0.0f, 2.0f, 0.0f },
-                .up = { 0.0f, 1.0f, 0.0f },
-                .fovy = 45.0f,
-                .projection = CAMERA_PERSPECTIVE
-                });
-
-        drawHandBlock(inv.items[hudPos], (Vector3){0, 0, 0});
-
-        const float size = 50.0f;
-        // DrawCube((Vector3){0, 0, 0}, size, size, size, RED);
-        DrawCubeWires((Vector3){0, 0, 0}, size, size, size, BLACK);
-
-        EndMode3D();
-
-        EndTextureMode();
-
-        DrawTexture(target.texture, width - (width/2), height - (height/2), WHITE);
-    } else {
-        RenderTexture2D target = LoadRenderTexture(width/2, width/2);
-
-        BeginTextureMode(target);
-
-        ClearBackground((Color){ 0, 0, 0, 0 });
-
-        BeginMode3D((Camera) {
-                .position = { 20.0f, 10.0f, 10.0f },
-                .target = { 0.0f, 0.0f, 0.0f },
-                .up = { 0.0f, 1.0f, 10.0f },
-                .fovy = 45.0f,
-                .projection = CAMERA_PERSPECTIVE
-                });
-
-        const float hand_width  = 10.0f;
-        const float hand_length = 3.5f;
-
-        DrawCube((Vector3){0, 0, 0}, hand_length, hand_length, hand_width, BROWN);
-        DrawCubeWires((Vector3){0, 0, 0}, hand_length, hand_length, hand_width, DARKGRAY);
-
-        EndMode3D();
-
-        EndTextureMode();
-
-        DrawTexture(target.texture, width - (width/2), height - (height/2), WHITE);
-    }
+	RenderTexture2D target;
+	TextureSubtype subtype;
+	if(hudPos < inv.size) {
+		subtype.block = inv.items[hudPos];
+		target = textures_get(T_HAND_BLOCK, subtype);
+	}
+	else
+		target = textures_get(T_HAND, subtype);
+	DrawTexture(target.texture, width - (width/2), height - (height/2), WHITE);
 }
 
 void gameLoop() {

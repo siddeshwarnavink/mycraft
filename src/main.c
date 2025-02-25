@@ -6,6 +6,7 @@
 #include "game.h"
 #include "state.h"
 #include "sounds.h"
+#include "textures.h"
 
 int main(void) {
     srand(time(NULL));
@@ -13,6 +14,8 @@ int main(void) {
     width = WINDOW_WIDTH;
     height = WINDOW_HEIGHT;
     InitWindow(width, height, "Mycraft");
+
+    textures_init();
 
     InitAudioDevice();
     loadSounds();
@@ -46,6 +49,7 @@ int main(void) {
 
     CloseWindow();
     UnloadTexture(texture);
+    textures_clean();
     unloadSounds();
     CloseAudioDevice();
 
