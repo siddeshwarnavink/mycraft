@@ -1,8 +1,11 @@
 #include <stdio.h>
 
+#include "window.h"
 #include "textures.h"
+#include "inventory.h"
 
 static Textures textures;
+static Texture2D sprite;
 
 /*
  * Find index given type and subtype.
@@ -19,7 +22,7 @@ static int _find_texture(enum TextureType type, TextureSubtype subtype) {
  * Handle rendering right hand.
  */
 static RenderTexture2D _render_hand() {
-    RenderTexture2D target = LoadRenderTexture(width/2, width/2);
+    RenderTexture2D target = LoadRenderTexture(getWindow().width/2, getWindow().width/2);
 
     BeginTextureMode(target);
 
@@ -76,7 +79,7 @@ static RenderTexture2D _render_hud_block(enum BlockType block) {
  * Handle rendering block at player's hand.
  */
 static RenderTexture2D _render_hand_block(enum BlockType block) {
-    RenderTexture2D target = LoadRenderTexture(width/2, width/2);
+    RenderTexture2D target = LoadRenderTexture(getWindow().width/2, getWindow().width/2);
 
     BeginTextureMode(target);
 
@@ -90,7 +93,7 @@ static RenderTexture2D _render_hand_block(enum BlockType block) {
             .projection = CAMERA_PERSPECTIVE
             });
 
-    drawHandBlock(inv.items[hudPos], (Vector3){0, 0, 0});
+    drawHandBlock(getInv().items[getInv().selected], (Vector3){0, 0, 0});
 
     const float size = 50.0f;
     DrawCubeWires((Vector3){0, 0, 0}, size, size, size, BLACK);
@@ -125,13 +128,18 @@ static RenderTexture2D _render_texture(enum TextureType type, TextureSubtype sub
     }
 }
 
-void textures_init() {
+Texture2D getSprite() {
+    return sprite;
+}
+
+void initTextures() {
+    sprite = LoadTexture("resources/texture.png");
     textures.size = 0;
     for (int i = 0; i < MAX_TEXTURES; i++)
         textures.entries[i].type = -1;
 }
 
-RenderTexture2D textures_get(enum TextureType type, TextureSubtype subtype) {
+RenderTexture2D getTexture(enum TextureType type, TextureSubtype subtype) {
     int index = _find_texture(type, subtype);
     if (index != -1) {
         return textures.entries[index].renderTexture;
@@ -150,7 +158,8 @@ RenderTexture2D textures_get(enum TextureType type, TextureSubtype subtype) {
     return newEntry.renderTexture;
 }
 
-void textures_clean() {
+void freeTextures() {
+    UnloadTexture(sprite);
     for (int i = 0; i < textures.size; i++) {
         UnloadRenderTexture(textures.entries[i].renderTexture);
     }

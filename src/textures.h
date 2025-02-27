@@ -9,7 +9,6 @@
 #include "raylib.h"
 
 #include "blocks.h"
-#include "state.h"
 
 #define MAX_TEXTURES 20
 
@@ -35,19 +34,21 @@ typedef struct {
     uint8_t size;
 } Textures;
 
+Texture2D getSprite();
+
 /*
  * Initialize the textures hashmap.
  */
-void textures_init();
+void initTextures();
 
 /*
  * Get render texture.
  */
-RenderTexture2D textures_get(enum TextureType type, TextureSubtype subtype);
+RenderTexture2D getTexture(enum TextureType type, TextureSubtype subtype);
 
 /*
  * Cleanup all textures.
  */
-void textures_clean();
+void freeTextures();
 
 #endif // !TEXTURES_H

@@ -23,12 +23,12 @@ extern Sound sounds[10];
 /*
  * Loads all the sound into memory.
  */
-void loadSounds();
+void initSounds();
 
 /*
  * Unloads all the sound from memory.
  */
-void unloadSounds();
+void freeSounds();
 
 /*
  * Play a specific sound.

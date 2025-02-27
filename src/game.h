@@ -1,9 +1,11 @@
+/*
+ * Contains the game loop.
+ */
 #ifndef GAME_H
 #define GAME_H
 
-/*
- * Main game loop.
- */
+#include "utils.h"
+
 void gameLoop();
 
 #endif // !GAME_H

@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include "rlgl.h"
 
-#include "state.h"
+#include "textures.h"
 
 /*
  * Use the sprite texture to draw a 3D cube.
@@ -15,14 +15,14 @@ static void _render_block(float size, Vector2 textureCoord, Vector3 position) {
 	const float height = size;
 	const float length = size;
 
-	const float texWidth = (float)texture.width;
-	const float texHeight = (float)texture.height;
+	const float texWidth = (float)getSprite().width;
+	const float texHeight = (float)getSprite().height;
 
 	Rectangle source = { textureCoord.x, textureCoord.y, 32, 32 };
 
 	const Color color = WHITE;
 
-	rlSetTexture(texture.id);
+	rlSetTexture(getSprite().id);
 
 	rlBegin(RL_QUADS);
 	rlColor4ub(color.r, color.g, color.b, color.a);

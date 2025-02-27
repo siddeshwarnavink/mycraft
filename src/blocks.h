@@ -1,6 +1,10 @@
 #ifndef BLOCKS_H
 #define BLOCKS_H
 
+#include "raylib.h"
+
+#include "utils.h"
+
 enum BlockType {
     B_VOID = 0,
     B_BEDROCK,

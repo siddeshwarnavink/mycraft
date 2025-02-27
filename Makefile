@@ -1,33 +1,21 @@
-CC      = cc
-CFLAGS  = -I./include/
-LDFLAGS = -L./lib/ -I./include/ -l:libraylib.a -lm
-OBJS = game.o core.o state.o blocks.o sounds.o inventory.o textures.o
+CC       = cc
+CFLAGS   = -I./include/
+LDFLAGS  = -L./lib/ -I./include/ -l:libraylib.a -lm
+SRCS     = $(wildcard src/*.c)
+BUILDDIR = .build/linux/
+OBJS     = $(patsubst src/%.c, $(BUILDDIR)%.o, $(SRCS))
 
-mycraft: $(OBJS)
-	$(CC) -o mycraft $(OBJS) src/main.c $(CFLAGS) $(LDFLAGS)
+mycraft: $(BUILDDIR) $(OBJS)
+	$(CC) -o $(BUILDDIR)mycraft $(OBJS) $(CFLAGS) $(LDFLAGS)
+	ln -s resources $(BUILDDIR)resources
 
-game.o: src/game.c
-	$(CC) -c src/game.c $(CFLAGS)
+$(BUILDDIR)%.o: src/%.c | $(BUILDDIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-core.o: src/core.c
-	$(CC) -c src/core.c $(CFLAGS)
-
-state.o: src/state.c
-	$(CC) -c src/state.c $(CFLAGS)
-
-blocks.o: src/blocks.c
-	$(CC) -c src/blocks.c $(CFLAGS)
-
-sounds.o: src/sounds.c
-	$(CC) -c src/sounds.c $(CFLAGS)
-
-inventory.o: src/inventory.c
-	$(CC) -c src/inventory.c $(CFLAGS)
-
-textures.o: src/textures.c
-	$(CC) -c src/textures.c $(CFLAGS)
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
 
 clean:
-	rm -f *.o mycraft
+	rm -rf $(BUILDDIR)
 
 .PHONY: clean

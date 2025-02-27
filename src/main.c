@@ -3,55 +3,39 @@
 
 #include "raylib.h"
 
+#include "window.h"
 #include "game.h"
-#include "state.h"
 #include "sounds.h"
+#include "world.h"
+#include "player.h"
+#include "inventory.h"
 #include "textures.h"
 
 int main(void) {
     srand(time(NULL));
 
-    width = WINDOW_WIDTH;
-    height = WINDOW_HEIGHT;
-    InitWindow(width, height, "Mycraft");
+    initWindow();
+    initTextures();
 
-    textures_init();
-
-    InitAudioDevice();
-    loadSounds();
+    initSounds();
     playSound(S_BACKGROUND1);
 
-    DisableCursor();
-    SetMousePosition(width/2, height/2);
-
-    SetTargetFPS(30);
-
-    texture = LoadTexture("resources/texture.png");
+    initWorld();
+    initPlayer();
+    initInventory();
 
     while (!WindowShouldClose()) {
-        // Fullscreen toggle
-        if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT))) {
-            const int display = GetCurrentMonitor();
-            if (IsWindowFullscreen()) {
-                width = WINDOW_WIDTH;
-                height = WINDOW_HEIGHT;
-            }
-            else {
-                width = GetMonitorWidth(display);
-                height = GetMonitorHeight(display);
-            }
-            SetWindowSize(width, height);
-            ToggleFullscreen();
-        }
-
+        if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
+            toggleFullscreen();
         gameLoop();
     }
 
-    CloseWindow();
-    UnloadTexture(texture);
-    textures_clean();
-    unloadSounds();
-    CloseAudioDevice();
+    freeWindow();
+    freePlayer();
+    freeWorld();
+    freeInventory();
+    freeTextures();
+    freeSounds();
 
     return 0;
 }

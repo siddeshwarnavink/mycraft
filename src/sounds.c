@@ -4,7 +4,9 @@
 
 Sound sounds[10] = {};
 
-void loadSounds() {
+void initSounds() {
+    InitAudioDevice();
+
 	char buf[24];
 	for (int i = 0; i < 10; ++i) {
 		sprintf(buf, "resources/sounds/%d.ogg", i);
@@ -16,10 +18,11 @@ void loadSounds() {
 	SetSoundVolume(sounds[S_PUNCH], 0.75);
 }
 
-void unloadSounds() {
+void freeSounds() {
 	for (int i = 0; i < 7; ++i) {
 		UnloadSound(sounds[i]);
 	}
+    CloseAudioDevice();
 }
 
 void playSound(enum SoundFile file) {
