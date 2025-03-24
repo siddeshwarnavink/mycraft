@@ -16,7 +16,8 @@ enum SoundFile {
 	S_HURT4,
 	S_BREAK1,
 	S_BREAK2,
-	S_PUNCH
+	S_PUNCH,
+	S_CLICK
 };
 extern Sound sounds[10];
 

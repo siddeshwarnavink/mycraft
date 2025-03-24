@@ -157,7 +157,6 @@ void gameLoop() {
         DrawText(TextFormat("Camera: %.2f, %.2f, %.2f", getPlayer().camera.position.x, getPlayer().camera.position.y, getPlayer().camera.position.z), 10, 20, 20, BLACK);
         DrawText(TextFormat("Block under player: %d", blockUnderPlayer()), 10, 40, 20, BLACK);
         DrawText(TextFormat("Vertical velocity: %.2f", getPlayer().verticalVelocity), 10, 60, 20, BLACK);
-        DrawText(TextFormat("Player colliding: %d", playerColliding()), 10, 80, 20, BLACK);
     }
 
     EndDrawing();

@@ -6,9 +6,9 @@
 
 #include "blocks.h"
 
-#define WORLD_LENGTH  20
-#define WORLD_BREADTH 20
-#define WORLD_HEIGHT  20
+#define WORLD_LENGTH  15
+#define WORLD_BREADTH 15
+#define WORLD_HEIGHT  15
 #define BLOCK_SIZE 1.0f
 
 typedef struct {

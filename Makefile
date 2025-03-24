@@ -1,21 +1,13 @@
-CC       = cc
-CFLAGS   = -I./include/
-LDFLAGS  = -L./lib/ -I./include/ -l:libraylib.a -lm
-SRCS     = $(wildcard src/*.c)
-BUILDDIR = .build/linux/
-OBJS     = $(patsubst src/%.c, $(BUILDDIR)%.o, $(SRCS))
+.PHONY: all linux wasm clean
 
-mycraft: $(BUILDDIR) $(OBJS)
-	$(CC) -o $(BUILDDIR)mycraft $(OBJS) $(CFLAGS) $(LDFLAGS)
-	ln -sf resources $(BUILDDIR)resources
+all: linux
 
-$(BUILDDIR)%.o: src/%.c | $(BUILDDIR)
-	$(CC) $(CFLAGS) -c -o $@ $<
+linux:
+	$(MAKE) -f Makefile.linux
 
-$(BUILDDIR):
-	mkdir -p $(BUILDDIR)
+wasm:
+	$(MAKE) -f Makefile.wasm
 
 clean:
-	rm -rf $(BUILDDIR)
-
-.PHONY: clean
+	$(MAKE) -f Makefile.linux clean
+	$(MAKE) -f Makefile.wasm clean

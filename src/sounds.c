@@ -8,7 +8,7 @@ void initSounds() {
     InitAudioDevice();
 
 	char buf[24];
-	for (int i = 0; i < 10; ++i) {
+	for (int i = 0; i < 11; ++i) {
 		sprintf(buf, "resources/sounds/%d.ogg", i);
 		sounds[i] = LoadSound(buf);
 	}
