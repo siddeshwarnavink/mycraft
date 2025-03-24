@@ -115,8 +115,7 @@ void gameLoop() {
             setInvSelected(0);
     }
 
-    handleGravity();
-    handleCollision();
+    handleCollisonAndGravity();
 
     BeginDrawing();
 
@@ -125,8 +124,20 @@ void gameLoop() {
     BeginMode3D(getPlayer().camera);
 
     // Player hitbox
-    if(debugMode)
-        DrawCubeWires(getPlayer().camera.position, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_WIDTH, DARKPURPLE);
+    if(debugMode) {
+        Vector3 player = getPlayer().camera.position;
+        DrawCubeWires((Vector3){ player.x, player.y - PLAYER_HEIGHT / 2, player.z }, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_WIDTH, RED);
+
+        for (int depth = 0; depth < WORLD_HEIGHT; ++depth) {
+            for (int length = 0; length < WORLD_LENGTH; ++length) {
+                for (int breath = 0; breath < WORLD_BREADTH; ++breath) {
+                    if(getWorld().blocks[depth][length][breath] == B_VOID) continue;
+                    Vector3 block = (Vector3){ (float)length, (float)depth, (float)breath };
+                    DrawCubeWires(block, 1.0f, 1.0f, 1.0f, RED); // Matches block rendering
+                }
+            }
+        }
+    }
 
     _block_selection();
 
@@ -143,15 +154,10 @@ void gameLoop() {
 
     // Debug
     if(debugMode) {
-        DrawText(TextFormat("Selected: %d, %d, %d", getPlayer().blockSelected.x, getPlayer().blockSelected.y, getPlayer().blockSelected.z), 20, 10, 10, BLACK);
-        DrawText(TextFormat("Camera position: %.2f, %.2f, %.2f", getPlayer().camera.position.x, getPlayer().camera.position.y, getPlayer().camera.position.z), 20, 20, 10, BLACK);
-        DrawText(TextFormat("Camera target: %.2f, %.2f, %.2f", getPlayer().camera.target.x, getPlayer().camera.target.y, getPlayer().camera.target.z), 20, 30, 10, BLACK);
-        DrawText(TextFormat("Mouse holding: %d", isHolding), 20, 40, 10, BLACK);
-        DrawText(TextFormat("Mouse holding duration: %.2f", holdTime), 20, 50, 10, BLACK);
-        DrawText(TextFormat("Block under: %d", blockUnderPlayer()), 20, 60, 10, BLACK);
-        DrawText(TextFormat("Player colliding: %d", playerColliding()), 20, 70, 10, BLACK);
-        DrawText(TextFormat("Mouse scroll: %f", scroll), 20, 80, 10, BLACK);
-        DrawText(TextFormat("HUD cursor position: %d", getInv().selected), 20, 90, 10, BLACK);
+        DrawText(TextFormat("Camera: %.2f, %.2f, %.2f", getPlayer().camera.position.x, getPlayer().camera.position.y, getPlayer().camera.position.z), 10, 20, 20, BLACK);
+        DrawText(TextFormat("Block under player: %d", blockUnderPlayer()), 10, 40, 20, BLACK);
+        DrawText(TextFormat("Vertical velocity: %.2f", getPlayer().verticalVelocity), 10, 60, 20, BLACK);
+        DrawText(TextFormat("Player colliding: %d", playerColliding()), 10, 80, 20, BLACK);
     }
 
     EndDrawing();

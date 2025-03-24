@@ -77,6 +77,8 @@ Inventory getInv() {
 
 void initInventory() {
     inv.selected = 0;
+    for(int i = 0; i < 64; ++i)
+        invAddItem(B_STONE);
 }
 
 void setInvSelected(int p) {

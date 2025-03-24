@@ -46,18 +46,16 @@ extern enum BlockType blockUnderPlayer();
 
 
 /*
- * If player is colliding with a block.
+ * If player is colliding with a block. Takes
+ * player's old position as input and determine
+ * weather to halt the player movement or not.
  */
-extern uint8_t playerColliding(void);
+extern uint8_t playerColliding(Vector3 oldPos);
+
 
 /*
- * Player gravity logic.
+ * Handles both collision and gravity.
  */
-extern void handleGravity(void);
-
-/*
- * Player collision logic
- */
-extern void handleCollision(void);
+extern void handleCollisonAndGravity();
 
 #endif // !PLAYER_H

@@ -7,7 +7,7 @@ OBJS     = $(patsubst src/%.c, $(BUILDDIR)%.o, $(SRCS))
 
 mycraft: $(BUILDDIR) $(OBJS)
 	$(CC) -o $(BUILDDIR)mycraft $(OBJS) $(CFLAGS) $(LDFLAGS)
-	ln -s resources $(BUILDDIR)resources
+	ln -sf resources $(BUILDDIR)resources
 
 $(BUILDDIR)%.o: src/%.c | $(BUILDDIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
