@@ -45,6 +45,10 @@ int main(void) {
 
 #ifdef PLATFORM_WEB
     emscripten_set_main_loop(loop, 0, 1);
+    if (WindowShouldClose()) {
+        emscripten_cancel_main_loop();
+        CloseWindow();
+    }
 #else
     while (!WindowShouldClose()) {
         loop();

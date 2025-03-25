@@ -109,6 +109,7 @@ static RenderTexture2D _render_hand_block(enum BlockType block) {
  * Render appropriate texture given type and subtype.
  */
 static RenderTexture2D _render_texture(enum TextureType type, TextureSubtype subtype) {
+    rlPushMatrix();
     switch(type) {
         case T_HUD_BLOCK:
             printf("[info] Rendering T_HUD_BLOCK %d\n", subtype.block);
@@ -126,6 +127,7 @@ static RenderTexture2D _render_texture(enum TextureType type, TextureSubtype sub
             printf("[error] Invalid texture type\n");
             return (RenderTexture2D){0};
     }
+    rlPopMatrix();
 }
 
 Texture2D getSprite() {

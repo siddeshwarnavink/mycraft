@@ -1,0 +1,21 @@
+CC       = emcc
+CFLAGS   = -I./include/ -s USE_GLFW=3 -s ALLOW_MEMORY_GROWTH=1 -s WASM=1 -DPLATFORM_WEB
+LDFLAGS  = -L./lib/wasm/ -I./include/ -l:libraylib.a -lm
+SRCS     = $(wildcard src/*.c)
+BUILDDIR = .build/wasm/
+OBJS     = $(patsubst src/%.c, $(BUILDDIR)%.o, $(SRCS))
+
+mycraft: $(BUILDDIR) $(OBJS)
+	$(CC) -o $(BUILDDIR)index.html $(OBJS) $(CFLAGS) $(LDFLAGS) --preload-file resources
+	cp -r resources $(BUILDDIR)
+
+$(BUILDDIR)%.o: src/%.c | $(BUILDDIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
+
+clean:
+	rm -rf $(BUILDDIR)
+
+.PHONY: clean

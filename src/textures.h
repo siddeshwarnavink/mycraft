@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "raylib.h"
+#include "rlgl.h"
 
 #include "blocks.h"
 
